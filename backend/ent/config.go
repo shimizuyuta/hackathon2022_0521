@@ -24,6 +24,7 @@ type config struct {
 
 // hooks per client, for fast access.
 type hooks struct {
+	Skill     []ent.Hook
 	User      []ent.Hook
 	UserSkill []ent.Hook
 }

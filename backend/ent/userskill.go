@@ -14,8 +14,9 @@ import (
 type UserSkill struct {
 	config
 	// ID of the ent.
-	ID               int `json:"id,omitempty"`
-	user_user_skills *int
+	ID                int `json:"id,omitempty"`
+	skill_user_skills *int
+	user_user_skills  *int
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -25,7 +26,9 @@ func (*UserSkill) scanValues(columns []string) ([]interface{}, error) {
 		switch columns[i] {
 		case userskill.FieldID:
 			values[i] = new(sql.NullInt64)
-		case userskill.ForeignKeys[0]: // user_user_skills
+		case userskill.ForeignKeys[0]: // skill_user_skills
+			values[i] = new(sql.NullInt64)
+		case userskill.ForeignKeys[1]: // user_user_skills
 			values[i] = new(sql.NullInt64)
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type UserSkill", columns[i])
@@ -49,6 +52,13 @@ func (us *UserSkill) assignValues(columns []string, values []interface{}) error 
 			}
 			us.ID = int(value.Int64)
 		case userskill.ForeignKeys[0]:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for edge-field skill_user_skills", value)
+			} else if value.Valid {
+				us.skill_user_skills = new(int)
+				*us.skill_user_skills = int(value.Int64)
+			}
+		case userskill.ForeignKeys[1]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for edge-field user_user_skills", value)
 			} else if value.Valid {

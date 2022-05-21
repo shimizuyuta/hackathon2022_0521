@@ -8,10 +8,21 @@ import (
 )
 
 var (
+	// SkillsColumns holds the columns for the "skills" table.
+	SkillsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "name", Type: field.TypeString, Unique: true},
+	}
+	// SkillsTable holds the schema information for the "skills" table.
+	SkillsTable = &schema.Table{
+		Name:       "skills",
+		Columns:    SkillsColumns,
+		PrimaryKey: []*schema.Column{SkillsColumns[0]},
+	}
 	// UsersColumns holds the columns for the "users" table.
 	UsersColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "name", Type: field.TypeString},
+		{Name: "name", Type: field.TypeString, Unique: true},
 		{Name: "email", Type: field.TypeString, Unique: true},
 		{Name: "password_hash", Type: field.TypeString},
 	}
@@ -24,6 +35,7 @@ var (
 	// UserSkillsColumns holds the columns for the "user_skills" table.
 	UserSkillsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "skill_user_skills", Type: field.TypeInt, Nullable: true},
 		{Name: "user_user_skills", Type: field.TypeInt, Nullable: true},
 	}
 	// UserSkillsTable holds the schema information for the "user_skills" table.
@@ -33,8 +45,14 @@ var (
 		PrimaryKey: []*schema.Column{UserSkillsColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "user_skills_users_user_skills",
+				Symbol:     "user_skills_skills_user_skills",
 				Columns:    []*schema.Column{UserSkillsColumns[1]},
+				RefColumns: []*schema.Column{SkillsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "user_skills_users_user_skills",
+				Columns:    []*schema.Column{UserSkillsColumns[2]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -42,11 +60,13 @@ var (
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
+		SkillsTable,
 		UsersTable,
 		UserSkillsTable,
 	}
 )
 
 func init() {
-	UserSkillsTable.ForeignKeys[0].RefTable = UsersTable
+	UserSkillsTable.ForeignKeys[0].RefTable = SkillsTable
+	UserSkillsTable.ForeignKeys[1].RefTable = UsersTable
 }
