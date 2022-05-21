@@ -14,8 +14,7 @@ type Post struct {
 // Fields of the Post.
 func (Post) Fields() []ent.Field {
 	return []ent.Field{
-		field.Int("user_id").
-			Optional(),
+		field.Int("user_id"),
 		field.String("title"),
 		field.String("description"),
 		field.Time("start_at"),
