@@ -1,0 +1,21 @@
+version: '3'
+services:
+  backend:
+    build:
+      context: ./backend
+    ports:
+      - 8080:8080
+  client:
+    build:
+      context: ./client
+    ports:
+      - 80:80
+    depends_on:
+      - backend
+  db:
+    image: mysql:latest
+    platform: linux/amd64
+    environment:
+      MYSQL_ROOT_PASSWORD: pass
+    ports:
+      - 3306:3306
