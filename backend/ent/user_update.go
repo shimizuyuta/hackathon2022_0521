@@ -11,8 +11,8 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/squadra-ricordo/ent/predicate"
+	"github.com/squadra-ricordo/ent/skill"
 	"github.com/squadra-ricordo/ent/user"
-	"github.com/squadra-ricordo/ent/userskill"
 )
 
 // UserUpdate is the builder for updating User entities.
@@ -46,19 +46,19 @@ func (uu *UserUpdate) SetPasswordHash(s string) *UserUpdate {
 	return uu
 }
 
-// AddUserSkillIDs adds the "user_skills" edge to the UserSkill entity by IDs.
-func (uu *UserUpdate) AddUserSkillIDs(ids ...int) *UserUpdate {
-	uu.mutation.AddUserSkillIDs(ids...)
+// AddSkillIDs adds the "skills" edge to the Skill entity by IDs.
+func (uu *UserUpdate) AddSkillIDs(ids ...int) *UserUpdate {
+	uu.mutation.AddSkillIDs(ids...)
 	return uu
 }
 
-// AddUserSkills adds the "user_skills" edges to the UserSkill entity.
-func (uu *UserUpdate) AddUserSkills(u ...*UserSkill) *UserUpdate {
-	ids := make([]int, len(u))
-	for i := range u {
-		ids[i] = u[i].ID
+// AddSkills adds the "skills" edges to the Skill entity.
+func (uu *UserUpdate) AddSkills(s ...*Skill) *UserUpdate {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
 	}
-	return uu.AddUserSkillIDs(ids...)
+	return uu.AddSkillIDs(ids...)
 }
 
 // Mutation returns the UserMutation object of the builder.
@@ -66,25 +66,25 @@ func (uu *UserUpdate) Mutation() *UserMutation {
 	return uu.mutation
 }
 
-// ClearUserSkills clears all "user_skills" edges to the UserSkill entity.
-func (uu *UserUpdate) ClearUserSkills() *UserUpdate {
-	uu.mutation.ClearUserSkills()
+// ClearSkills clears all "skills" edges to the Skill entity.
+func (uu *UserUpdate) ClearSkills() *UserUpdate {
+	uu.mutation.ClearSkills()
 	return uu
 }
 
-// RemoveUserSkillIDs removes the "user_skills" edge to UserSkill entities by IDs.
-func (uu *UserUpdate) RemoveUserSkillIDs(ids ...int) *UserUpdate {
-	uu.mutation.RemoveUserSkillIDs(ids...)
+// RemoveSkillIDs removes the "skills" edge to Skill entities by IDs.
+func (uu *UserUpdate) RemoveSkillIDs(ids ...int) *UserUpdate {
+	uu.mutation.RemoveSkillIDs(ids...)
 	return uu
 }
 
-// RemoveUserSkills removes "user_skills" edges to UserSkill entities.
-func (uu *UserUpdate) RemoveUserSkills(u ...*UserSkill) *UserUpdate {
-	ids := make([]int, len(u))
-	for i := range u {
-		ids[i] = u[i].ID
+// RemoveSkills removes "skills" edges to Skill entities.
+func (uu *UserUpdate) RemoveSkills(s ...*Skill) *UserUpdate {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
 	}
-	return uu.RemoveUserSkillIDs(ids...)
+	return uu.RemoveSkillIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -180,33 +180,33 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: user.FieldPasswordHash,
 		})
 	}
-	if uu.mutation.UserSkillsCleared() {
+	if uu.mutation.SkillsCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   user.UserSkillsTable,
-			Columns: []string{user.UserSkillsColumn},
+			Table:   user.SkillsTable,
+			Columns: user.SkillsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
-					Column: userskill.FieldID,
+					Column: skill.FieldID,
 				},
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := uu.mutation.RemovedUserSkillsIDs(); len(nodes) > 0 && !uu.mutation.UserSkillsCleared() {
+	if nodes := uu.mutation.RemovedSkillsIDs(); len(nodes) > 0 && !uu.mutation.SkillsCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   user.UserSkillsTable,
-			Columns: []string{user.UserSkillsColumn},
+			Table:   user.SkillsTable,
+			Columns: user.SkillsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
-					Column: userskill.FieldID,
+					Column: skill.FieldID,
 				},
 			},
 		}
@@ -215,17 +215,17 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := uu.mutation.UserSkillsIDs(); len(nodes) > 0 {
+	if nodes := uu.mutation.SkillsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   user.UserSkillsTable,
-			Columns: []string{user.UserSkillsColumn},
+			Table:   user.SkillsTable,
+			Columns: user.SkillsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
-					Column: userskill.FieldID,
+					Column: skill.FieldID,
 				},
 			},
 		}
@@ -271,19 +271,19 @@ func (uuo *UserUpdateOne) SetPasswordHash(s string) *UserUpdateOne {
 	return uuo
 }
 
-// AddUserSkillIDs adds the "user_skills" edge to the UserSkill entity by IDs.
-func (uuo *UserUpdateOne) AddUserSkillIDs(ids ...int) *UserUpdateOne {
-	uuo.mutation.AddUserSkillIDs(ids...)
+// AddSkillIDs adds the "skills" edge to the Skill entity by IDs.
+func (uuo *UserUpdateOne) AddSkillIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.AddSkillIDs(ids...)
 	return uuo
 }
 
-// AddUserSkills adds the "user_skills" edges to the UserSkill entity.
-func (uuo *UserUpdateOne) AddUserSkills(u ...*UserSkill) *UserUpdateOne {
-	ids := make([]int, len(u))
-	for i := range u {
-		ids[i] = u[i].ID
+// AddSkills adds the "skills" edges to the Skill entity.
+func (uuo *UserUpdateOne) AddSkills(s ...*Skill) *UserUpdateOne {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
 	}
-	return uuo.AddUserSkillIDs(ids...)
+	return uuo.AddSkillIDs(ids...)
 }
 
 // Mutation returns the UserMutation object of the builder.
@@ -291,25 +291,25 @@ func (uuo *UserUpdateOne) Mutation() *UserMutation {
 	return uuo.mutation
 }
 
-// ClearUserSkills clears all "user_skills" edges to the UserSkill entity.
-func (uuo *UserUpdateOne) ClearUserSkills() *UserUpdateOne {
-	uuo.mutation.ClearUserSkills()
+// ClearSkills clears all "skills" edges to the Skill entity.
+func (uuo *UserUpdateOne) ClearSkills() *UserUpdateOne {
+	uuo.mutation.ClearSkills()
 	return uuo
 }
 
-// RemoveUserSkillIDs removes the "user_skills" edge to UserSkill entities by IDs.
-func (uuo *UserUpdateOne) RemoveUserSkillIDs(ids ...int) *UserUpdateOne {
-	uuo.mutation.RemoveUserSkillIDs(ids...)
+// RemoveSkillIDs removes the "skills" edge to Skill entities by IDs.
+func (uuo *UserUpdateOne) RemoveSkillIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.RemoveSkillIDs(ids...)
 	return uuo
 }
 
-// RemoveUserSkills removes "user_skills" edges to UserSkill entities.
-func (uuo *UserUpdateOne) RemoveUserSkills(u ...*UserSkill) *UserUpdateOne {
-	ids := make([]int, len(u))
-	for i := range u {
-		ids[i] = u[i].ID
+// RemoveSkills removes "skills" edges to Skill entities.
+func (uuo *UserUpdateOne) RemoveSkills(s ...*Skill) *UserUpdateOne {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
 	}
-	return uuo.RemoveUserSkillIDs(ids...)
+	return uuo.RemoveSkillIDs(ids...)
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
@@ -429,33 +429,33 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 			Column: user.FieldPasswordHash,
 		})
 	}
-	if uuo.mutation.UserSkillsCleared() {
+	if uuo.mutation.SkillsCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   user.UserSkillsTable,
-			Columns: []string{user.UserSkillsColumn},
+			Table:   user.SkillsTable,
+			Columns: user.SkillsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
-					Column: userskill.FieldID,
+					Column: skill.FieldID,
 				},
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := uuo.mutation.RemovedUserSkillsIDs(); len(nodes) > 0 && !uuo.mutation.UserSkillsCleared() {
+	if nodes := uuo.mutation.RemovedSkillsIDs(); len(nodes) > 0 && !uuo.mutation.SkillsCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   user.UserSkillsTable,
-			Columns: []string{user.UserSkillsColumn},
+			Table:   user.SkillsTable,
+			Columns: user.SkillsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
-					Column: userskill.FieldID,
+					Column: skill.FieldID,
 				},
 			},
 		}
@@ -464,17 +464,17 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := uuo.mutation.UserSkillsIDs(); len(nodes) > 0 {
+	if nodes := uuo.mutation.SkillsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   user.UserSkillsTable,
-			Columns: []string{user.UserSkillsColumn},
+			Table:   user.SkillsTable,
+			Columns: user.SkillsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
-					Column: userskill.FieldID,
+					Column: skill.FieldID,
 				},
 			},
 		}

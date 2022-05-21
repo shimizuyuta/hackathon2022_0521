@@ -14,7 +14,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/squadra-ricordo/ent/predicate"
 	"github.com/squadra-ricordo/ent/skill"
-	"github.com/squadra-ricordo/ent/userskill"
+	"github.com/squadra-ricordo/ent/user"
 )
 
 // SkillQuery is the builder for querying Skill entities.
@@ -27,7 +27,7 @@ type SkillQuery struct {
 	fields     []string
 	predicates []predicate.Skill
 	// eager-loading edges.
-	withUserSkills *UserSkillQuery
+	withUsers *UserQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -64,9 +64,9 @@ func (sq *SkillQuery) Order(o ...OrderFunc) *SkillQuery {
 	return sq
 }
 
-// QueryUserSkills chains the current query on the "user_skills" edge.
-func (sq *SkillQuery) QueryUserSkills() *UserSkillQuery {
-	query := &UserSkillQuery{config: sq.config}
+// QueryUsers chains the current query on the "users" edge.
+func (sq *SkillQuery) QueryUsers() *UserQuery {
+	query := &UserQuery{config: sq.config}
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := sq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -77,8 +77,8 @@ func (sq *SkillQuery) QueryUserSkills() *UserSkillQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(skill.Table, skill.FieldID, selector),
-			sqlgraph.To(userskill.Table, userskill.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, skill.UserSkillsTable, skill.UserSkillsColumn),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, skill.UsersTable, skill.UsersPrimaryKey...),
 		)
 		fromU = sqlgraph.SetNeighbors(sq.driver.Dialect(), step)
 		return fromU, nil
@@ -262,12 +262,12 @@ func (sq *SkillQuery) Clone() *SkillQuery {
 		return nil
 	}
 	return &SkillQuery{
-		config:         sq.config,
-		limit:          sq.limit,
-		offset:         sq.offset,
-		order:          append([]OrderFunc{}, sq.order...),
-		predicates:     append([]predicate.Skill{}, sq.predicates...),
-		withUserSkills: sq.withUserSkills.Clone(),
+		config:     sq.config,
+		limit:      sq.limit,
+		offset:     sq.offset,
+		order:      append([]OrderFunc{}, sq.order...),
+		predicates: append([]predicate.Skill{}, sq.predicates...),
+		withUsers:  sq.withUsers.Clone(),
 		// clone intermediate query.
 		sql:    sq.sql.Clone(),
 		path:   sq.path,
@@ -275,14 +275,14 @@ func (sq *SkillQuery) Clone() *SkillQuery {
 	}
 }
 
-// WithUserSkills tells the query-builder to eager-load the nodes that are connected to
-// the "user_skills" edge. The optional arguments are used to configure the query builder of the edge.
-func (sq *SkillQuery) WithUserSkills(opts ...func(*UserSkillQuery)) *SkillQuery {
-	query := &UserSkillQuery{config: sq.config}
+// WithUsers tells the query-builder to eager-load the nodes that are connected to
+// the "users" edge. The optional arguments are used to configure the query builder of the edge.
+func (sq *SkillQuery) WithUsers(opts ...func(*UserQuery)) *SkillQuery {
+	query := &UserQuery{config: sq.config}
 	for _, opt := range opts {
 		opt(query)
 	}
-	sq.withUserSkills = query
+	sq.withUsers = query
 	return sq
 }
 
@@ -352,7 +352,7 @@ func (sq *SkillQuery) sqlAll(ctx context.Context) ([]*Skill, error) {
 		nodes       = []*Skill{}
 		_spec       = sq.querySpec()
 		loadedTypes = [1]bool{
-			sq.withUserSkills != nil,
+			sq.withUsers != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]interface{}, error) {
@@ -375,32 +375,68 @@ func (sq *SkillQuery) sqlAll(ctx context.Context) ([]*Skill, error) {
 		return nodes, nil
 	}
 
-	if query := sq.withUserSkills; query != nil {
+	if query := sq.withUsers; query != nil {
 		fks := make([]driver.Value, 0, len(nodes))
-		nodeids := make(map[int]*Skill)
-		for i := range nodes {
-			fks = append(fks, nodes[i].ID)
-			nodeids[nodes[i].ID] = nodes[i]
-			nodes[i].Edges.UserSkills = []*UserSkill{}
+		ids := make(map[int]*Skill, len(nodes))
+		for _, node := range nodes {
+			ids[node.ID] = node
+			fks = append(fks, node.ID)
+			node.Edges.Users = []*User{}
 		}
-		query.withFKs = true
-		query.Where(predicate.UserSkill(func(s *sql.Selector) {
-			s.Where(sql.InValues(skill.UserSkillsColumn, fks...))
-		}))
+		var (
+			edgeids []int
+			edges   = make(map[int][]*Skill)
+		)
+		_spec := &sqlgraph.EdgeQuerySpec{
+			Edge: &sqlgraph.EdgeSpec{
+				Inverse: true,
+				Table:   skill.UsersTable,
+				Columns: skill.UsersPrimaryKey,
+			},
+			Predicate: func(s *sql.Selector) {
+				s.Where(sql.InValues(skill.UsersPrimaryKey[1], fks...))
+			},
+			ScanValues: func() [2]interface{} {
+				return [2]interface{}{new(sql.NullInt64), new(sql.NullInt64)}
+			},
+			Assign: func(out, in interface{}) error {
+				eout, ok := out.(*sql.NullInt64)
+				if !ok || eout == nil {
+					return fmt.Errorf("unexpected id value for edge-out")
+				}
+				ein, ok := in.(*sql.NullInt64)
+				if !ok || ein == nil {
+					return fmt.Errorf("unexpected id value for edge-in")
+				}
+				outValue := int(eout.Int64)
+				inValue := int(ein.Int64)
+				node, ok := ids[outValue]
+				if !ok {
+					return fmt.Errorf("unexpected node id in edges: %v", outValue)
+				}
+				if _, ok := edges[inValue]; !ok {
+					edgeids = append(edgeids, inValue)
+				}
+				edges[inValue] = append(edges[inValue], node)
+				return nil
+			},
+		}
+		if err := sqlgraph.QueryEdges(ctx, sq.driver, _spec); err != nil {
+			return nil, fmt.Errorf(`query edges "users": %w`, err)
+		}
+		query.Where(user.IDIn(edgeids...))
 		neighbors, err := query.All(ctx)
 		if err != nil {
 			return nil, err
 		}
 		for _, n := range neighbors {
-			fk := n.skill_user_skills
-			if fk == nil {
-				return nil, fmt.Errorf(`foreign-key "skill_user_skills" is nil for node %v`, n.ID)
-			}
-			node, ok := nodeids[*fk]
+			nodes, ok := edges[n.ID]
 			if !ok {
-				return nil, fmt.Errorf(`unexpected foreign-key "skill_user_skills" returned %v for node %v`, *fk, n.ID)
+				return nil, fmt.Errorf(`unexpected "users" node returned %v`, n.ID)
 			}
-			node.Edges.UserSkills = append(node.Edges.UserSkills, n)
+			for i := range nodes {
+				nodes[i].Edges.Users = append(nodes[i].Edges.Users, n)
+			}
 		}
 	}
 

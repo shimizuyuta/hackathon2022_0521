@@ -209,25 +209,25 @@ func NameContainsFold(v string) predicate.Skill {
 	})
 }
 
-// HasUserSkills applies the HasEdge predicate on the "user_skills" edge.
-func HasUserSkills() predicate.Skill {
+// HasUsers applies the HasEdge predicate on the "users" edge.
+func HasUsers() predicate.Skill {
 	return predicate.Skill(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(UserSkillsTable, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, UserSkillsTable, UserSkillsColumn),
+			sqlgraph.To(UsersTable, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, UsersTable, UsersPrimaryKey...),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasUserSkillsWith applies the HasEdge predicate on the "user_skills" edge with a given conditions (other predicates).
-func HasUserSkillsWith(preds ...predicate.UserSkill) predicate.Skill {
+// HasUsersWith applies the HasEdge predicate on the "users" edge with a given conditions (other predicates).
+func HasUsersWith(preds ...predicate.User) predicate.Skill {
 	return predicate.Skill(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(UserSkillsInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, UserSkillsTable, UserSkillsColumn),
+			sqlgraph.To(UsersInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, UsersTable, UsersPrimaryKey...),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
