@@ -1,4 +1,4 @@
-package main
+package lib
 
 import (
 	"context"
@@ -9,7 +9,7 @@ import (
 	"github.com/squadra-ricordo/ent/migrate"
 )
 
-func main() {
+func InitDB() {
 	client, err := ent.Open("mysql", "root:pass@tcp(localhost:3306)/test")
 	if err != nil {
 		log.Fatalf("failed connecting to mysql: %v", err)
