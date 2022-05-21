@@ -9,8 +9,8 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/squadra-ricordo/ent/skill"
 	"github.com/squadra-ricordo/ent/user"
-	"github.com/squadra-ricordo/ent/userskill"
 )
 
 // UserCreate is the builder for creating a User entity.
@@ -38,19 +38,19 @@ func (uc *UserCreate) SetPasswordHash(s string) *UserCreate {
 	return uc
 }
 
-// AddUserSkillIDs adds the "user_skills" edge to the UserSkill entity by IDs.
-func (uc *UserCreate) AddUserSkillIDs(ids ...int) *UserCreate {
-	uc.mutation.AddUserSkillIDs(ids...)
+// AddSkillIDs adds the "skills" edge to the Skill entity by IDs.
+func (uc *UserCreate) AddSkillIDs(ids ...int) *UserCreate {
+	uc.mutation.AddSkillIDs(ids...)
 	return uc
 }
 
-// AddUserSkills adds the "user_skills" edges to the UserSkill entity.
-func (uc *UserCreate) AddUserSkills(u ...*UserSkill) *UserCreate {
-	ids := make([]int, len(u))
-	for i := range u {
-		ids[i] = u[i].ID
+// AddSkills adds the "skills" edges to the Skill entity.
+func (uc *UserCreate) AddSkills(s ...*Skill) *UserCreate {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
 	}
-	return uc.AddUserSkillIDs(ids...)
+	return uc.AddSkillIDs(ids...)
 }
 
 // Mutation returns the UserMutation object of the builder.
@@ -183,17 +183,17 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 		})
 		_node.PasswordHash = value
 	}
-	if nodes := uc.mutation.UserSkillsIDs(); len(nodes) > 0 {
+	if nodes := uc.mutation.SkillsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   user.UserSkillsTable,
-			Columns: []string{user.UserSkillsColumn},
+			Table:   user.SkillsTable,
+			Columns: user.SkillsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
-					Column: userskill.FieldID,
+					Column: skill.FieldID,
 				},
 			},
 		}

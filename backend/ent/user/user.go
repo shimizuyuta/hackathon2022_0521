@@ -13,17 +13,15 @@ const (
 	FieldEmail = "email"
 	// FieldPasswordHash holds the string denoting the password_hash field in the database.
 	FieldPasswordHash = "password_hash"
-	// EdgeUserSkills holds the string denoting the user_skills edge name in mutations.
-	EdgeUserSkills = "user_skills"
+	// EdgeSkills holds the string denoting the skills edge name in mutations.
+	EdgeSkills = "skills"
 	// Table holds the table name of the user in the database.
 	Table = "users"
-	// UserSkillsTable is the table that holds the user_skills relation/edge.
-	UserSkillsTable = "user_skills"
-	// UserSkillsInverseTable is the table name for the UserSkill entity.
-	// It exists in this package in order to avoid circular dependency with the "userskill" package.
-	UserSkillsInverseTable = "user_skills"
-	// UserSkillsColumn is the table column denoting the user_skills relation/edge.
-	UserSkillsColumn = "user_user_skills"
+	// SkillsTable is the table that holds the skills relation/edge. The primary key declared below.
+	SkillsTable = "user_skills"
+	// SkillsInverseTable is the table name for the Skill entity.
+	// It exists in this package in order to avoid circular dependency with the "skill" package.
+	SkillsInverseTable = "skills"
 )
 
 // Columns holds all SQL columns for user fields.
@@ -33,6 +31,12 @@ var Columns = []string{
 	FieldEmail,
 	FieldPasswordHash,
 }
+
+var (
+	// SkillsPrimaryKey and SkillsColumn2 are the table columns denoting the
+	// primary key for the skills relation (M2M).
+	SkillsPrimaryKey = []string{"user_id", "skill_id"}
+)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {

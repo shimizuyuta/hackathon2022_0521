@@ -24,25 +24,24 @@ const (
 	OpUpdateOne = ent.OpUpdateOne
 
 	// Node types.
-	TypeSkill     = "Skill"
-	TypeUser      = "User"
-	TypeUserSkill = "UserSkill"
+	TypeSkill = "Skill"
+	TypeUser  = "User"
 )
 
 // SkillMutation represents an operation that mutates the Skill nodes in the graph.
 type SkillMutation struct {
 	config
-	op                 Op
-	typ                string
-	id                 *int
-	name               *string
-	clearedFields      map[string]struct{}
-	user_skills        map[int]struct{}
-	removeduser_skills map[int]struct{}
-	cleareduser_skills bool
-	done               bool
-	oldValue           func(context.Context) (*Skill, error)
-	predicates         []predicate.Skill
+	op            Op
+	typ           string
+	id            *int
+	name          *string
+	clearedFields map[string]struct{}
+	users         map[int]struct{}
+	removedusers  map[int]struct{}
+	clearedusers  bool
+	done          bool
+	oldValue      func(context.Context) (*Skill, error)
+	predicates    []predicate.Skill
 }
 
 var _ ent.Mutation = (*SkillMutation)(nil)
@@ -179,58 +178,58 @@ func (m *SkillMutation) ResetName() {
 	m.name = nil
 }
 
-// AddUserSkillIDs adds the "user_skills" edge to the UserSkill entity by ids.
-func (m *SkillMutation) AddUserSkillIDs(ids ...int) {
-	if m.user_skills == nil {
-		m.user_skills = make(map[int]struct{})
+// AddUserIDs adds the "users" edge to the User entity by ids.
+func (m *SkillMutation) AddUserIDs(ids ...int) {
+	if m.users == nil {
+		m.users = make(map[int]struct{})
 	}
 	for i := range ids {
-		m.user_skills[ids[i]] = struct{}{}
+		m.users[ids[i]] = struct{}{}
 	}
 }
 
-// ClearUserSkills clears the "user_skills" edge to the UserSkill entity.
-func (m *SkillMutation) ClearUserSkills() {
-	m.cleareduser_skills = true
+// ClearUsers clears the "users" edge to the User entity.
+func (m *SkillMutation) ClearUsers() {
+	m.clearedusers = true
 }
 
-// UserSkillsCleared reports if the "user_skills" edge to the UserSkill entity was cleared.
-func (m *SkillMutation) UserSkillsCleared() bool {
-	return m.cleareduser_skills
+// UsersCleared reports if the "users" edge to the User entity was cleared.
+func (m *SkillMutation) UsersCleared() bool {
+	return m.clearedusers
 }
 
-// RemoveUserSkillIDs removes the "user_skills" edge to the UserSkill entity by IDs.
-func (m *SkillMutation) RemoveUserSkillIDs(ids ...int) {
-	if m.removeduser_skills == nil {
-		m.removeduser_skills = make(map[int]struct{})
+// RemoveUserIDs removes the "users" edge to the User entity by IDs.
+func (m *SkillMutation) RemoveUserIDs(ids ...int) {
+	if m.removedusers == nil {
+		m.removedusers = make(map[int]struct{})
 	}
 	for i := range ids {
-		delete(m.user_skills, ids[i])
-		m.removeduser_skills[ids[i]] = struct{}{}
+		delete(m.users, ids[i])
+		m.removedusers[ids[i]] = struct{}{}
 	}
 }
 
-// RemovedUserSkills returns the removed IDs of the "user_skills" edge to the UserSkill entity.
-func (m *SkillMutation) RemovedUserSkillsIDs() (ids []int) {
-	for id := range m.removeduser_skills {
+// RemovedUsers returns the removed IDs of the "users" edge to the User entity.
+func (m *SkillMutation) RemovedUsersIDs() (ids []int) {
+	for id := range m.removedusers {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// UserSkillsIDs returns the "user_skills" edge IDs in the mutation.
-func (m *SkillMutation) UserSkillsIDs() (ids []int) {
-	for id := range m.user_skills {
+// UsersIDs returns the "users" edge IDs in the mutation.
+func (m *SkillMutation) UsersIDs() (ids []int) {
+	for id := range m.users {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// ResetUserSkills resets all changes to the "user_skills" edge.
-func (m *SkillMutation) ResetUserSkills() {
-	m.user_skills = nil
-	m.cleareduser_skills = false
-	m.removeduser_skills = nil
+// ResetUsers resets all changes to the "users" edge.
+func (m *SkillMutation) ResetUsers() {
+	m.users = nil
+	m.clearedusers = false
+	m.removedusers = nil
 }
 
 // Where appends a list predicates to the SkillMutation builder.
@@ -352,8 +351,8 @@ func (m *SkillMutation) ResetField(name string) error {
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *SkillMutation) AddedEdges() []string {
 	edges := make([]string, 0, 1)
-	if m.user_skills != nil {
-		edges = append(edges, skill.EdgeUserSkills)
+	if m.users != nil {
+		edges = append(edges, skill.EdgeUsers)
 	}
 	return edges
 }
@@ -362,9 +361,9 @@ func (m *SkillMutation) AddedEdges() []string {
 // name in this mutation.
 func (m *SkillMutation) AddedIDs(name string) []ent.Value {
 	switch name {
-	case skill.EdgeUserSkills:
-		ids := make([]ent.Value, 0, len(m.user_skills))
-		for id := range m.user_skills {
+	case skill.EdgeUsers:
+		ids := make([]ent.Value, 0, len(m.users))
+		for id := range m.users {
 			ids = append(ids, id)
 		}
 		return ids
@@ -375,8 +374,8 @@ func (m *SkillMutation) AddedIDs(name string) []ent.Value {
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *SkillMutation) RemovedEdges() []string {
 	edges := make([]string, 0, 1)
-	if m.removeduser_skills != nil {
-		edges = append(edges, skill.EdgeUserSkills)
+	if m.removedusers != nil {
+		edges = append(edges, skill.EdgeUsers)
 	}
 	return edges
 }
@@ -385,9 +384,9 @@ func (m *SkillMutation) RemovedEdges() []string {
 // the given name in this mutation.
 func (m *SkillMutation) RemovedIDs(name string) []ent.Value {
 	switch name {
-	case skill.EdgeUserSkills:
-		ids := make([]ent.Value, 0, len(m.removeduser_skills))
-		for id := range m.removeduser_skills {
+	case skill.EdgeUsers:
+		ids := make([]ent.Value, 0, len(m.removedusers))
+		for id := range m.removedusers {
 			ids = append(ids, id)
 		}
 		return ids
@@ -398,8 +397,8 @@ func (m *SkillMutation) RemovedIDs(name string) []ent.Value {
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *SkillMutation) ClearedEdges() []string {
 	edges := make([]string, 0, 1)
-	if m.cleareduser_skills {
-		edges = append(edges, skill.EdgeUserSkills)
+	if m.clearedusers {
+		edges = append(edges, skill.EdgeUsers)
 	}
 	return edges
 }
@@ -408,8 +407,8 @@ func (m *SkillMutation) ClearedEdges() []string {
 // was cleared in this mutation.
 func (m *SkillMutation) EdgeCleared(name string) bool {
 	switch name {
-	case skill.EdgeUserSkills:
-		return m.cleareduser_skills
+	case skill.EdgeUsers:
+		return m.clearedusers
 	}
 	return false
 }
@@ -426,8 +425,8 @@ func (m *SkillMutation) ClearEdge(name string) error {
 // It returns an error if the edge is not defined in the schema.
 func (m *SkillMutation) ResetEdge(name string) error {
 	switch name {
-	case skill.EdgeUserSkills:
-		m.ResetUserSkills()
+	case skill.EdgeUsers:
+		m.ResetUsers()
 		return nil
 	}
 	return fmt.Errorf("unknown Skill edge %s", name)
@@ -436,19 +435,19 @@ func (m *SkillMutation) ResetEdge(name string) error {
 // UserMutation represents an operation that mutates the User nodes in the graph.
 type UserMutation struct {
 	config
-	op                 Op
-	typ                string
-	id                 *int
-	name               *string
-	email              *string
-	password_hash      *string
-	clearedFields      map[string]struct{}
-	user_skills        map[int]struct{}
-	removeduser_skills map[int]struct{}
-	cleareduser_skills bool
-	done               bool
-	oldValue           func(context.Context) (*User, error)
-	predicates         []predicate.User
+	op            Op
+	typ           string
+	id            *int
+	name          *string
+	email         *string
+	password_hash *string
+	clearedFields map[string]struct{}
+	skills        map[int]struct{}
+	removedskills map[int]struct{}
+	clearedskills bool
+	done          bool
+	oldValue      func(context.Context) (*User, error)
+	predicates    []predicate.User
 }
 
 var _ ent.Mutation = (*UserMutation)(nil)
@@ -657,58 +656,58 @@ func (m *UserMutation) ResetPasswordHash() {
 	m.password_hash = nil
 }
 
-// AddUserSkillIDs adds the "user_skills" edge to the UserSkill entity by ids.
-func (m *UserMutation) AddUserSkillIDs(ids ...int) {
-	if m.user_skills == nil {
-		m.user_skills = make(map[int]struct{})
+// AddSkillIDs adds the "skills" edge to the Skill entity by ids.
+func (m *UserMutation) AddSkillIDs(ids ...int) {
+	if m.skills == nil {
+		m.skills = make(map[int]struct{})
 	}
 	for i := range ids {
-		m.user_skills[ids[i]] = struct{}{}
+		m.skills[ids[i]] = struct{}{}
 	}
 }
 
-// ClearUserSkills clears the "user_skills" edge to the UserSkill entity.
-func (m *UserMutation) ClearUserSkills() {
-	m.cleareduser_skills = true
+// ClearSkills clears the "skills" edge to the Skill entity.
+func (m *UserMutation) ClearSkills() {
+	m.clearedskills = true
 }
 
-// UserSkillsCleared reports if the "user_skills" edge to the UserSkill entity was cleared.
-func (m *UserMutation) UserSkillsCleared() bool {
-	return m.cleareduser_skills
+// SkillsCleared reports if the "skills" edge to the Skill entity was cleared.
+func (m *UserMutation) SkillsCleared() bool {
+	return m.clearedskills
 }
 
-// RemoveUserSkillIDs removes the "user_skills" edge to the UserSkill entity by IDs.
-func (m *UserMutation) RemoveUserSkillIDs(ids ...int) {
-	if m.removeduser_skills == nil {
-		m.removeduser_skills = make(map[int]struct{})
+// RemoveSkillIDs removes the "skills" edge to the Skill entity by IDs.
+func (m *UserMutation) RemoveSkillIDs(ids ...int) {
+	if m.removedskills == nil {
+		m.removedskills = make(map[int]struct{})
 	}
 	for i := range ids {
-		delete(m.user_skills, ids[i])
-		m.removeduser_skills[ids[i]] = struct{}{}
+		delete(m.skills, ids[i])
+		m.removedskills[ids[i]] = struct{}{}
 	}
 }
 
-// RemovedUserSkills returns the removed IDs of the "user_skills" edge to the UserSkill entity.
-func (m *UserMutation) RemovedUserSkillsIDs() (ids []int) {
-	for id := range m.removeduser_skills {
+// RemovedSkills returns the removed IDs of the "skills" edge to the Skill entity.
+func (m *UserMutation) RemovedSkillsIDs() (ids []int) {
+	for id := range m.removedskills {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// UserSkillsIDs returns the "user_skills" edge IDs in the mutation.
-func (m *UserMutation) UserSkillsIDs() (ids []int) {
-	for id := range m.user_skills {
+// SkillsIDs returns the "skills" edge IDs in the mutation.
+func (m *UserMutation) SkillsIDs() (ids []int) {
+	for id := range m.skills {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// ResetUserSkills resets all changes to the "user_skills" edge.
-func (m *UserMutation) ResetUserSkills() {
-	m.user_skills = nil
-	m.cleareduser_skills = false
-	m.removeduser_skills = nil
+// ResetSkills resets all changes to the "skills" edge.
+func (m *UserMutation) ResetSkills() {
+	m.skills = nil
+	m.clearedskills = false
+	m.removedskills = nil
 }
 
 // Where appends a list predicates to the UserMutation builder.
@@ -864,8 +863,8 @@ func (m *UserMutation) ResetField(name string) error {
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *UserMutation) AddedEdges() []string {
 	edges := make([]string, 0, 1)
-	if m.user_skills != nil {
-		edges = append(edges, user.EdgeUserSkills)
+	if m.skills != nil {
+		edges = append(edges, user.EdgeSkills)
 	}
 	return edges
 }
@@ -874,9 +873,9 @@ func (m *UserMutation) AddedEdges() []string {
 // name in this mutation.
 func (m *UserMutation) AddedIDs(name string) []ent.Value {
 	switch name {
-	case user.EdgeUserSkills:
-		ids := make([]ent.Value, 0, len(m.user_skills))
-		for id := range m.user_skills {
+	case user.EdgeSkills:
+		ids := make([]ent.Value, 0, len(m.skills))
+		for id := range m.skills {
 			ids = append(ids, id)
 		}
 		return ids
@@ -887,8 +886,8 @@ func (m *UserMutation) AddedIDs(name string) []ent.Value {
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *UserMutation) RemovedEdges() []string {
 	edges := make([]string, 0, 1)
-	if m.removeduser_skills != nil {
-		edges = append(edges, user.EdgeUserSkills)
+	if m.removedskills != nil {
+		edges = append(edges, user.EdgeSkills)
 	}
 	return edges
 }
@@ -897,9 +896,9 @@ func (m *UserMutation) RemovedEdges() []string {
 // the given name in this mutation.
 func (m *UserMutation) RemovedIDs(name string) []ent.Value {
 	switch name {
-	case user.EdgeUserSkills:
-		ids := make([]ent.Value, 0, len(m.removeduser_skills))
-		for id := range m.removeduser_skills {
+	case user.EdgeSkills:
+		ids := make([]ent.Value, 0, len(m.removedskills))
+		for id := range m.removedskills {
 			ids = append(ids, id)
 		}
 		return ids
@@ -910,8 +909,8 @@ func (m *UserMutation) RemovedIDs(name string) []ent.Value {
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *UserMutation) ClearedEdges() []string {
 	edges := make([]string, 0, 1)
-	if m.cleareduser_skills {
-		edges = append(edges, user.EdgeUserSkills)
+	if m.clearedskills {
+		edges = append(edges, user.EdgeSkills)
 	}
 	return edges
 }
@@ -920,8 +919,8 @@ func (m *UserMutation) ClearedEdges() []string {
 // was cleared in this mutation.
 func (m *UserMutation) EdgeCleared(name string) bool {
 	switch name {
-	case user.EdgeUserSkills:
-		return m.cleareduser_skills
+	case user.EdgeSkills:
+		return m.clearedskills
 	}
 	return false
 }
@@ -938,258 +937,9 @@ func (m *UserMutation) ClearEdge(name string) error {
 // It returns an error if the edge is not defined in the schema.
 func (m *UserMutation) ResetEdge(name string) error {
 	switch name {
-	case user.EdgeUserSkills:
-		m.ResetUserSkills()
+	case user.EdgeSkills:
+		m.ResetSkills()
 		return nil
 	}
 	return fmt.Errorf("unknown User edge %s", name)
-}
-
-// UserSkillMutation represents an operation that mutates the UserSkill nodes in the graph.
-type UserSkillMutation struct {
-	config
-	op            Op
-	typ           string
-	id            *int
-	clearedFields map[string]struct{}
-	done          bool
-	oldValue      func(context.Context) (*UserSkill, error)
-	predicates    []predicate.UserSkill
-}
-
-var _ ent.Mutation = (*UserSkillMutation)(nil)
-
-// userskillOption allows management of the mutation configuration using functional options.
-type userskillOption func(*UserSkillMutation)
-
-// newUserSkillMutation creates new mutation for the UserSkill entity.
-func newUserSkillMutation(c config, op Op, opts ...userskillOption) *UserSkillMutation {
-	m := &UserSkillMutation{
-		config:        c,
-		op:            op,
-		typ:           TypeUserSkill,
-		clearedFields: make(map[string]struct{}),
-	}
-	for _, opt := range opts {
-		opt(m)
-	}
-	return m
-}
-
-// withUserSkillID sets the ID field of the mutation.
-func withUserSkillID(id int) userskillOption {
-	return func(m *UserSkillMutation) {
-		var (
-			err   error
-			once  sync.Once
-			value *UserSkill
-		)
-		m.oldValue = func(ctx context.Context) (*UserSkill, error) {
-			once.Do(func() {
-				if m.done {
-					err = errors.New("querying old values post mutation is not allowed")
-				} else {
-					value, err = m.Client().UserSkill.Get(ctx, id)
-				}
-			})
-			return value, err
-		}
-		m.id = &id
-	}
-}
-
-// withUserSkill sets the old UserSkill of the mutation.
-func withUserSkill(node *UserSkill) userskillOption {
-	return func(m *UserSkillMutation) {
-		m.oldValue = func(context.Context) (*UserSkill, error) {
-			return node, nil
-		}
-		m.id = &node.ID
-	}
-}
-
-// Client returns a new `ent.Client` from the mutation. If the mutation was
-// executed in a transaction (ent.Tx), a transactional client is returned.
-func (m UserSkillMutation) Client() *Client {
-	client := &Client{config: m.config}
-	client.init()
-	return client
-}
-
-// Tx returns an `ent.Tx` for mutations that were executed in transactions;
-// it returns an error otherwise.
-func (m UserSkillMutation) Tx() (*Tx, error) {
-	if _, ok := m.driver.(*txDriver); !ok {
-		return nil, errors.New("ent: mutation is not running in a transaction")
-	}
-	tx := &Tx{config: m.config}
-	tx.init()
-	return tx, nil
-}
-
-// ID returns the ID value in the mutation. Note that the ID is only available
-// if it was provided to the builder or after it was returned from the database.
-func (m *UserSkillMutation) ID() (id int, exists bool) {
-	if m.id == nil {
-		return
-	}
-	return *m.id, true
-}
-
-// IDs queries the database and returns the entity ids that match the mutation's predicate.
-// That means, if the mutation is applied within a transaction with an isolation level such
-// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
-// or updated by the mutation.
-func (m *UserSkillMutation) IDs(ctx context.Context) ([]int, error) {
-	switch {
-	case m.op.Is(OpUpdateOne | OpDeleteOne):
-		id, exists := m.ID()
-		if exists {
-			return []int{id}, nil
-		}
-		fallthrough
-	case m.op.Is(OpUpdate | OpDelete):
-		return m.Client().UserSkill.Query().Where(m.predicates...).IDs(ctx)
-	default:
-		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
-	}
-}
-
-// Where appends a list predicates to the UserSkillMutation builder.
-func (m *UserSkillMutation) Where(ps ...predicate.UserSkill) {
-	m.predicates = append(m.predicates, ps...)
-}
-
-// Op returns the operation name.
-func (m *UserSkillMutation) Op() Op {
-	return m.op
-}
-
-// Type returns the node type of this mutation (UserSkill).
-func (m *UserSkillMutation) Type() string {
-	return m.typ
-}
-
-// Fields returns all fields that were changed during this mutation. Note that in
-// order to get all numeric fields that were incremented/decremented, call
-// AddedFields().
-func (m *UserSkillMutation) Fields() []string {
-	fields := make([]string, 0, 0)
-	return fields
-}
-
-// Field returns the value of a field with the given name. The second boolean
-// return value indicates that this field was not set, or was not defined in the
-// schema.
-func (m *UserSkillMutation) Field(name string) (ent.Value, bool) {
-	return nil, false
-}
-
-// OldField returns the old value of the field from the database. An error is
-// returned if the mutation operation is not UpdateOne, or the query to the
-// database failed.
-func (m *UserSkillMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
-	return nil, fmt.Errorf("unknown UserSkill field %s", name)
-}
-
-// SetField sets the value of a field with the given name. It returns an error if
-// the field is not defined in the schema, or if the type mismatched the field
-// type.
-func (m *UserSkillMutation) SetField(name string, value ent.Value) error {
-	switch name {
-	}
-	return fmt.Errorf("unknown UserSkill field %s", name)
-}
-
-// AddedFields returns all numeric fields that were incremented/decremented during
-// this mutation.
-func (m *UserSkillMutation) AddedFields() []string {
-	return nil
-}
-
-// AddedField returns the numeric value that was incremented/decremented on a field
-// with the given name. The second boolean return value indicates that this field
-// was not set, or was not defined in the schema.
-func (m *UserSkillMutation) AddedField(name string) (ent.Value, bool) {
-	return nil, false
-}
-
-// AddField adds the value to the field with the given name. It returns an error if
-// the field is not defined in the schema, or if the type mismatched the field
-// type.
-func (m *UserSkillMutation) AddField(name string, value ent.Value) error {
-	return fmt.Errorf("unknown UserSkill numeric field %s", name)
-}
-
-// ClearedFields returns all nullable fields that were cleared during this
-// mutation.
-func (m *UserSkillMutation) ClearedFields() []string {
-	return nil
-}
-
-// FieldCleared returns a boolean indicating if a field with the given name was
-// cleared in this mutation.
-func (m *UserSkillMutation) FieldCleared(name string) bool {
-	_, ok := m.clearedFields[name]
-	return ok
-}
-
-// ClearField clears the value of the field with the given name. It returns an
-// error if the field is not defined in the schema.
-func (m *UserSkillMutation) ClearField(name string) error {
-	return fmt.Errorf("unknown UserSkill nullable field %s", name)
-}
-
-// ResetField resets all changes in the mutation for the field with the given name.
-// It returns an error if the field is not defined in the schema.
-func (m *UserSkillMutation) ResetField(name string) error {
-	return fmt.Errorf("unknown UserSkill field %s", name)
-}
-
-// AddedEdges returns all edge names that were set/added in this mutation.
-func (m *UserSkillMutation) AddedEdges() []string {
-	edges := make([]string, 0, 0)
-	return edges
-}
-
-// AddedIDs returns all IDs (to other nodes) that were added for the given edge
-// name in this mutation.
-func (m *UserSkillMutation) AddedIDs(name string) []ent.Value {
-	return nil
-}
-
-// RemovedEdges returns all edge names that were removed in this mutation.
-func (m *UserSkillMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 0)
-	return edges
-}
-
-// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
-// the given name in this mutation.
-func (m *UserSkillMutation) RemovedIDs(name string) []ent.Value {
-	return nil
-}
-
-// ClearedEdges returns all edge names that were cleared in this mutation.
-func (m *UserSkillMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 0)
-	return edges
-}
-
-// EdgeCleared returns a boolean which indicates if the edge with the given name
-// was cleared in this mutation.
-func (m *UserSkillMutation) EdgeCleared(name string) bool {
-	return false
-}
-
-// ClearEdge clears the value of the edge with the given name. It returns an error
-// if that edge is not defined in the schema.
-func (m *UserSkillMutation) ClearEdge(name string) error {
-	return fmt.Errorf("unknown UserSkill unique edge %s", name)
-}
-
-// ResetEdge resets all changes to the edge with the given name in this mutation.
-// It returns an error if the edge is not defined in the schema.
-func (m *UserSkillMutation) ResetEdge(name string) error {
-	return fmt.Errorf("unknown UserSkill edge %s", name)
 }
