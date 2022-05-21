@@ -2,9 +2,11 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/go-sql-driver/mysql"
 	"github.com/labstack/echo"
@@ -13,10 +15,17 @@ import (
 	lib "github.com/squadra-ricordo/lib"
 )
 
-var client *ent.Client
-var ctx context.Context
+type UserPostReqBody struct {
+	Name         string `json:"name"`
+	Email        string `json:"email"`
+	PasswordHash string `json:"password_hash"`
+}
 
 func main() {
+	fmt.Println("Please wait...")
+
+	time.Sleep(time.Second * 10)
+
 	lib.InitDB()
 
 	mysqlConfig := mysql.Config{
@@ -38,17 +47,21 @@ func main() {
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 
-	e.POST("/users", CreateUser)
+	e.POST("/users", func(c echo.Context) error {
+		p := &UserPostReqBody{}
+		err := c.Bind(p)
+		if err != nil {
+			return c.String(http.StatusBadRequest, "Bad Request")
+		}
+
+		fmt.Printf("%s %s %s", p.Name, p.Email, p.PasswordHash)
+
+		ctx := context.Background()
+
+		lib.CreateUser(client, p.Name, p.Email, p.PasswordHash, ctx)
+
+		return c.String(http.StatusOK, "")
+	})
 
 	e.Logger.Fatal(e.Start(":8080"))
-}
-
-func CreateUser(c echo.Context) error {
-	name := c.FormValue("name")
-	email := c.FormValue("email")
-	password_hash := c.FormValue("password_hash")
-
-	lib.CreateUser(client, name, email, password_hash, ctx)
-
-	return c.String(http.StatusOK, "")
 }
