@@ -28,20 +28,20 @@ type User struct {
 
 // UserEdges holds the relations/edges for other nodes in the graph.
 type UserEdges struct {
-	// UserSkills holds the value of the user_skills edge.
-	UserSkills []*UserSkill `json:"user_skills,omitempty"`
+	// Skills holds the value of the skills edge.
+	Skills []*Skill `json:"skills,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [1]bool
 }
 
-// UserSkillsOrErr returns the UserSkills value or an error if the edge
+// SkillsOrErr returns the Skills value or an error if the edge
 // was not loaded in eager-loading.
-func (e UserEdges) UserSkillsOrErr() ([]*UserSkill, error) {
+func (e UserEdges) SkillsOrErr() ([]*Skill, error) {
 	if e.loadedTypes[0] {
-		return e.UserSkills, nil
+		return e.Skills, nil
 	}
-	return nil, &NotLoadedError{edge: "user_skills"}
+	return nil, &NotLoadedError{edge: "skills"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -97,9 +97,9 @@ func (u *User) assignValues(columns []string, values []interface{}) error {
 	return nil
 }
 
-// QueryUserSkills queries the "user_skills" edge of the User entity.
-func (u *User) QueryUserSkills() *UserSkillQuery {
-	return (&UserClient{config: u.config}).QueryUserSkills(u)
+// QuerySkills queries the "skills" edge of the User entity.
+func (u *User) QuerySkills() *SkillQuery {
+	return (&UserClient{config: u.config}).QuerySkills(u)
 }
 
 // Update returns a builder for updating this User.

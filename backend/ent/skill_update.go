@@ -12,7 +12,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/squadra-ricordo/ent/predicate"
 	"github.com/squadra-ricordo/ent/skill"
-	"github.com/squadra-ricordo/ent/userskill"
+	"github.com/squadra-ricordo/ent/user"
 )
 
 // SkillUpdate is the builder for updating Skill entities.
@@ -34,19 +34,19 @@ func (su *SkillUpdate) SetName(s string) *SkillUpdate {
 	return su
 }
 
-// AddUserSkillIDs adds the "user_skills" edge to the UserSkill entity by IDs.
-func (su *SkillUpdate) AddUserSkillIDs(ids ...int) *SkillUpdate {
-	su.mutation.AddUserSkillIDs(ids...)
+// AddUserIDs adds the "users" edge to the User entity by IDs.
+func (su *SkillUpdate) AddUserIDs(ids ...int) *SkillUpdate {
+	su.mutation.AddUserIDs(ids...)
 	return su
 }
 
-// AddUserSkills adds the "user_skills" edges to the UserSkill entity.
-func (su *SkillUpdate) AddUserSkills(u ...*UserSkill) *SkillUpdate {
+// AddUsers adds the "users" edges to the User entity.
+func (su *SkillUpdate) AddUsers(u ...*User) *SkillUpdate {
 	ids := make([]int, len(u))
 	for i := range u {
 		ids[i] = u[i].ID
 	}
-	return su.AddUserSkillIDs(ids...)
+	return su.AddUserIDs(ids...)
 }
 
 // Mutation returns the SkillMutation object of the builder.
@@ -54,25 +54,25 @@ func (su *SkillUpdate) Mutation() *SkillMutation {
 	return su.mutation
 }
 
-// ClearUserSkills clears all "user_skills" edges to the UserSkill entity.
-func (su *SkillUpdate) ClearUserSkills() *SkillUpdate {
-	su.mutation.ClearUserSkills()
+// ClearUsers clears all "users" edges to the User entity.
+func (su *SkillUpdate) ClearUsers() *SkillUpdate {
+	su.mutation.ClearUsers()
 	return su
 }
 
-// RemoveUserSkillIDs removes the "user_skills" edge to UserSkill entities by IDs.
-func (su *SkillUpdate) RemoveUserSkillIDs(ids ...int) *SkillUpdate {
-	su.mutation.RemoveUserSkillIDs(ids...)
+// RemoveUserIDs removes the "users" edge to User entities by IDs.
+func (su *SkillUpdate) RemoveUserIDs(ids ...int) *SkillUpdate {
+	su.mutation.RemoveUserIDs(ids...)
 	return su
 }
 
-// RemoveUserSkills removes "user_skills" edges to UserSkill entities.
-func (su *SkillUpdate) RemoveUserSkills(u ...*UserSkill) *SkillUpdate {
+// RemoveUsers removes "users" edges to User entities.
+func (su *SkillUpdate) RemoveUsers(u ...*User) *SkillUpdate {
 	ids := make([]int, len(u))
 	for i := range u {
 		ids[i] = u[i].ID
 	}
-	return su.RemoveUserSkillIDs(ids...)
+	return su.RemoveUserIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -154,33 +154,33 @@ func (su *SkillUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: skill.FieldName,
 		})
 	}
-	if su.mutation.UserSkillsCleared() {
+	if su.mutation.UsersCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   skill.UserSkillsTable,
-			Columns: []string{skill.UserSkillsColumn},
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   skill.UsersTable,
+			Columns: skill.UsersPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
-					Column: userskill.FieldID,
+					Column: user.FieldID,
 				},
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := su.mutation.RemovedUserSkillsIDs(); len(nodes) > 0 && !su.mutation.UserSkillsCleared() {
+	if nodes := su.mutation.RemovedUsersIDs(); len(nodes) > 0 && !su.mutation.UsersCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   skill.UserSkillsTable,
-			Columns: []string{skill.UserSkillsColumn},
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   skill.UsersTable,
+			Columns: skill.UsersPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
-					Column: userskill.FieldID,
+					Column: user.FieldID,
 				},
 			},
 		}
@@ -189,17 +189,17 @@ func (su *SkillUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := su.mutation.UserSkillsIDs(); len(nodes) > 0 {
+	if nodes := su.mutation.UsersIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   skill.UserSkillsTable,
-			Columns: []string{skill.UserSkillsColumn},
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   skill.UsersTable,
+			Columns: skill.UsersPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
-					Column: userskill.FieldID,
+					Column: user.FieldID,
 				},
 			},
 		}
@@ -233,19 +233,19 @@ func (suo *SkillUpdateOne) SetName(s string) *SkillUpdateOne {
 	return suo
 }
 
-// AddUserSkillIDs adds the "user_skills" edge to the UserSkill entity by IDs.
-func (suo *SkillUpdateOne) AddUserSkillIDs(ids ...int) *SkillUpdateOne {
-	suo.mutation.AddUserSkillIDs(ids...)
+// AddUserIDs adds the "users" edge to the User entity by IDs.
+func (suo *SkillUpdateOne) AddUserIDs(ids ...int) *SkillUpdateOne {
+	suo.mutation.AddUserIDs(ids...)
 	return suo
 }
 
-// AddUserSkills adds the "user_skills" edges to the UserSkill entity.
-func (suo *SkillUpdateOne) AddUserSkills(u ...*UserSkill) *SkillUpdateOne {
+// AddUsers adds the "users" edges to the User entity.
+func (suo *SkillUpdateOne) AddUsers(u ...*User) *SkillUpdateOne {
 	ids := make([]int, len(u))
 	for i := range u {
 		ids[i] = u[i].ID
 	}
-	return suo.AddUserSkillIDs(ids...)
+	return suo.AddUserIDs(ids...)
 }
 
 // Mutation returns the SkillMutation object of the builder.
@@ -253,25 +253,25 @@ func (suo *SkillUpdateOne) Mutation() *SkillMutation {
 	return suo.mutation
 }
 
-// ClearUserSkills clears all "user_skills" edges to the UserSkill entity.
-func (suo *SkillUpdateOne) ClearUserSkills() *SkillUpdateOne {
-	suo.mutation.ClearUserSkills()
+// ClearUsers clears all "users" edges to the User entity.
+func (suo *SkillUpdateOne) ClearUsers() *SkillUpdateOne {
+	suo.mutation.ClearUsers()
 	return suo
 }
 
-// RemoveUserSkillIDs removes the "user_skills" edge to UserSkill entities by IDs.
-func (suo *SkillUpdateOne) RemoveUserSkillIDs(ids ...int) *SkillUpdateOne {
-	suo.mutation.RemoveUserSkillIDs(ids...)
+// RemoveUserIDs removes the "users" edge to User entities by IDs.
+func (suo *SkillUpdateOne) RemoveUserIDs(ids ...int) *SkillUpdateOne {
+	suo.mutation.RemoveUserIDs(ids...)
 	return suo
 }
 
-// RemoveUserSkills removes "user_skills" edges to UserSkill entities.
-func (suo *SkillUpdateOne) RemoveUserSkills(u ...*UserSkill) *SkillUpdateOne {
+// RemoveUsers removes "users" edges to User entities.
+func (suo *SkillUpdateOne) RemoveUsers(u ...*User) *SkillUpdateOne {
 	ids := make([]int, len(u))
 	for i := range u {
 		ids[i] = u[i].ID
 	}
-	return suo.RemoveUserSkillIDs(ids...)
+	return suo.RemoveUserIDs(ids...)
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
@@ -377,33 +377,33 @@ func (suo *SkillUpdateOne) sqlSave(ctx context.Context) (_node *Skill, err error
 			Column: skill.FieldName,
 		})
 	}
-	if suo.mutation.UserSkillsCleared() {
+	if suo.mutation.UsersCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   skill.UserSkillsTable,
-			Columns: []string{skill.UserSkillsColumn},
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   skill.UsersTable,
+			Columns: skill.UsersPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
-					Column: userskill.FieldID,
+					Column: user.FieldID,
 				},
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := suo.mutation.RemovedUserSkillsIDs(); len(nodes) > 0 && !suo.mutation.UserSkillsCleared() {
+	if nodes := suo.mutation.RemovedUsersIDs(); len(nodes) > 0 && !suo.mutation.UsersCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   skill.UserSkillsTable,
-			Columns: []string{skill.UserSkillsColumn},
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   skill.UsersTable,
+			Columns: skill.UsersPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
-					Column: userskill.FieldID,
+					Column: user.FieldID,
 				},
 			},
 		}
@@ -412,17 +412,17 @@ func (suo *SkillUpdateOne) sqlSave(ctx context.Context) (_node *Skill, err error
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := suo.mutation.UserSkillsIDs(); len(nodes) > 0 {
+	if nodes := suo.mutation.UsersIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   skill.UserSkillsTable,
-			Columns: []string{skill.UserSkillsColumn},
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   skill.UsersTable,
+			Columns: skill.UsersPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
-					Column: userskill.FieldID,
+					Column: user.FieldID,
 				},
 			},
 		}

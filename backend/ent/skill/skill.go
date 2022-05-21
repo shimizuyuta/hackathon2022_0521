@@ -9,17 +9,15 @@ const (
 	FieldID = "id"
 	// FieldName holds the string denoting the name field in the database.
 	FieldName = "name"
-	// EdgeUserSkills holds the string denoting the user_skills edge name in mutations.
-	EdgeUserSkills = "user_skills"
+	// EdgeUsers holds the string denoting the users edge name in mutations.
+	EdgeUsers = "users"
 	// Table holds the table name of the skill in the database.
 	Table = "skills"
-	// UserSkillsTable is the table that holds the user_skills relation/edge.
-	UserSkillsTable = "user_skills"
-	// UserSkillsInverseTable is the table name for the UserSkill entity.
-	// It exists in this package in order to avoid circular dependency with the "userskill" package.
-	UserSkillsInverseTable = "user_skills"
-	// UserSkillsColumn is the table column denoting the user_skills relation/edge.
-	UserSkillsColumn = "skill_user_skills"
+	// UsersTable is the table that holds the users relation/edge. The primary key declared below.
+	UsersTable = "user_skills"
+	// UsersInverseTable is the table name for the User entity.
+	// It exists in this package in order to avoid circular dependency with the "user" package.
+	UsersInverseTable = "users"
 )
 
 // Columns holds all SQL columns for skill fields.
@@ -27,6 +25,12 @@ var Columns = []string{
 	FieldID,
 	FieldName,
 }
+
+var (
+	// UsersPrimaryKey and UsersColumn2 are the table columns denoting the
+	// primary key for the users relation (M2M).
+	UsersPrimaryKey = []string{"user_id", "skill_id"}
+)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {

@@ -10,7 +10,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/squadra-ricordo/ent/skill"
-	"github.com/squadra-ricordo/ent/userskill"
+	"github.com/squadra-ricordo/ent/user"
 )
 
 // SkillCreate is the builder for creating a Skill entity.
@@ -26,19 +26,19 @@ func (sc *SkillCreate) SetName(s string) *SkillCreate {
 	return sc
 }
 
-// AddUserSkillIDs adds the "user_skills" edge to the UserSkill entity by IDs.
-func (sc *SkillCreate) AddUserSkillIDs(ids ...int) *SkillCreate {
-	sc.mutation.AddUserSkillIDs(ids...)
+// AddUserIDs adds the "users" edge to the User entity by IDs.
+func (sc *SkillCreate) AddUserIDs(ids ...int) *SkillCreate {
+	sc.mutation.AddUserIDs(ids...)
 	return sc
 }
 
-// AddUserSkills adds the "user_skills" edges to the UserSkill entity.
-func (sc *SkillCreate) AddUserSkills(u ...*UserSkill) *SkillCreate {
+// AddUsers adds the "users" edges to the User entity.
+func (sc *SkillCreate) AddUsers(u ...*User) *SkillCreate {
 	ids := make([]int, len(u))
 	for i := range u {
 		ids[i] = u[i].ID
 	}
-	return sc.AddUserSkillIDs(ids...)
+	return sc.AddUserIDs(ids...)
 }
 
 // Mutation returns the SkillMutation object of the builder.
@@ -149,17 +149,17 @@ func (sc *SkillCreate) createSpec() (*Skill, *sqlgraph.CreateSpec) {
 		})
 		_node.Name = value
 	}
-	if nodes := sc.mutation.UserSkillsIDs(); len(nodes) > 0 {
+	if nodes := sc.mutation.UsersIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   skill.UserSkillsTable,
-			Columns: []string{skill.UserSkillsColumn},
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   skill.UsersTable,
+			Columns: skill.UsersPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
-					Column: userskill.FieldID,
+					Column: user.FieldID,
 				},
 			},
 		}

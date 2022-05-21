@@ -24,6 +24,7 @@ func (User) Fields() []ent.Field {
 // Edges of the User.
 func (User) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("skills", Skill.Type).Field("user_id"),
+		edge.To("skills", Skill.Type),
 	}
+	// return nil
 }
