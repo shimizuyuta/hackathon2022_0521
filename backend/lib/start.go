@@ -1,4 +1,4 @@
-package main
+package lib
 
 import (
 	"context"
@@ -11,10 +11,11 @@ import (
 	"github.com/squadra-ricordo/ent/migrate"
 )
 
-func main() {
+func InitDB() {
 	mysqlConfig := mysql.Config{
 		User:                 "root",
 		Passwd:               os.Getenv("PASSWORD"),
+		Net:                  "tcp",
 		Addr:                 os.Getenv("DB_HOST") + ":3306",
 		DBName:               os.Getenv("DB_NAME"),
 		AllowNativePasswords: true,
