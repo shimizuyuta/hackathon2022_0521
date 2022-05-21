@@ -10,9 +10,11 @@ import (
 	"github.com/squadra-ricordo/ent/migrate"
 
 	"github.com/squadra-ricordo/ent/user"
+	"github.com/squadra-ricordo/ent/userskill"
 
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 // Client is the client that holds all ent builders.
@@ -22,6 +24,8 @@ type Client struct {
 	Schema *migrate.Schema
 	// User is the client for interacting with the User builders.
 	User *UserClient
+	// UserSkill is the client for interacting with the UserSkill builders.
+	UserSkill *UserSkillClient
 }
 
 // NewClient creates a new client configured with the given options.
@@ -36,6 +40,7 @@ func NewClient(opts ...Option) *Client {
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
 	c.User = NewUserClient(c.config)
+	c.UserSkill = NewUserSkillClient(c.config)
 }
 
 // Open opens a database/sql.DB specified by the driver name and
@@ -67,9 +72,10 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	cfg := c.config
 	cfg.driver = tx
 	return &Tx{
-		ctx:    ctx,
-		config: cfg,
-		User:   NewUserClient(cfg),
+		ctx:       ctx,
+		config:    cfg,
+		User:      NewUserClient(cfg),
+		UserSkill: NewUserSkillClient(cfg),
 	}, nil
 }
 
@@ -87,9 +93,10 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := c.config
 	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
-		ctx:    ctx,
-		config: cfg,
-		User:   NewUserClient(cfg),
+		ctx:       ctx,
+		config:    cfg,
+		User:      NewUserClient(cfg),
+		UserSkill: NewUserSkillClient(cfg),
 	}, nil
 }
 
@@ -120,6 +127,7 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	c.User.Use(hooks...)
+	c.UserSkill.Use(hooks...)
 }
 
 // UserClient is a client for the User schema.
@@ -207,7 +215,113 @@ func (c *UserClient) GetX(ctx context.Context, id int) *User {
 	return obj
 }
 
+// QueryUserSkills queries the user_skills edge of a User.
+func (c *UserClient) QueryUserSkills(u *User) *UserSkillQuery {
+	query := &UserSkillQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := u.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, id),
+			sqlgraph.To(userskill.Table, userskill.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, user.UserSkillsTable, user.UserSkillsColumn),
+		)
+		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *UserClient) Hooks() []Hook {
 	return c.hooks.User
+}
+
+// UserSkillClient is a client for the UserSkill schema.
+type UserSkillClient struct {
+	config
+}
+
+// NewUserSkillClient returns a client for the UserSkill from the given config.
+func NewUserSkillClient(c config) *UserSkillClient {
+	return &UserSkillClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `userskill.Hooks(f(g(h())))`.
+func (c *UserSkillClient) Use(hooks ...Hook) {
+	c.hooks.UserSkill = append(c.hooks.UserSkill, hooks...)
+}
+
+// Create returns a create builder for UserSkill.
+func (c *UserSkillClient) Create() *UserSkillCreate {
+	mutation := newUserSkillMutation(c.config, OpCreate)
+	return &UserSkillCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of UserSkill entities.
+func (c *UserSkillClient) CreateBulk(builders ...*UserSkillCreate) *UserSkillCreateBulk {
+	return &UserSkillCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for UserSkill.
+func (c *UserSkillClient) Update() *UserSkillUpdate {
+	mutation := newUserSkillMutation(c.config, OpUpdate)
+	return &UserSkillUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *UserSkillClient) UpdateOne(us *UserSkill) *UserSkillUpdateOne {
+	mutation := newUserSkillMutation(c.config, OpUpdateOne, withUserSkill(us))
+	return &UserSkillUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *UserSkillClient) UpdateOneID(id int) *UserSkillUpdateOne {
+	mutation := newUserSkillMutation(c.config, OpUpdateOne, withUserSkillID(id))
+	return &UserSkillUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for UserSkill.
+func (c *UserSkillClient) Delete() *UserSkillDelete {
+	mutation := newUserSkillMutation(c.config, OpDelete)
+	return &UserSkillDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a delete builder for the given entity.
+func (c *UserSkillClient) DeleteOne(us *UserSkill) *UserSkillDeleteOne {
+	return c.DeleteOneID(us.ID)
+}
+
+// DeleteOneID returns a delete builder for the given id.
+func (c *UserSkillClient) DeleteOneID(id int) *UserSkillDeleteOne {
+	builder := c.Delete().Where(userskill.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &UserSkillDeleteOne{builder}
+}
+
+// Query returns a query builder for UserSkill.
+func (c *UserSkillClient) Query() *UserSkillQuery {
+	return &UserSkillQuery{
+		config: c.config,
+	}
+}
+
+// Get returns a UserSkill entity by its id.
+func (c *UserSkillClient) Get(ctx context.Context, id int) (*UserSkill, error) {
+	return c.Query().Where(userskill.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *UserSkillClient) GetX(ctx context.Context, id int) *UserSkill {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *UserSkillClient) Hooks() []Hook {
+	return c.hooks.UserSkill
 }

@@ -21,6 +21,27 @@ type User struct {
 	Email string `json:"email,omitempty"`
 	// PasswordHash holds the value of the "password_hash" field.
 	PasswordHash string `json:"password_hash,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the UserQuery when eager-loading is set.
+	Edges UserEdges `json:"edges"`
+}
+
+// UserEdges holds the relations/edges for other nodes in the graph.
+type UserEdges struct {
+	// UserSkills holds the value of the user_skills edge.
+	UserSkills []*UserSkill `json:"user_skills,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [1]bool
+}
+
+// UserSkillsOrErr returns the UserSkills value or an error if the edge
+// was not loaded in eager-loading.
+func (e UserEdges) UserSkillsOrErr() ([]*UserSkill, error) {
+	if e.loadedTypes[0] {
+		return e.UserSkills, nil
+	}
+	return nil, &NotLoadedError{edge: "user_skills"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -74,6 +95,11 @@ func (u *User) assignValues(columns []string, values []interface{}) error {
 		}
 	}
 	return nil
+}
+
+// QueryUserSkills queries the "user_skills" edge of the User entity.
+func (u *User) QueryUserSkills() *UserSkillQuery {
+	return (&UserClient{config: u.config}).QueryUserSkills(u)
 }
 
 // Update returns a builder for updating this User.

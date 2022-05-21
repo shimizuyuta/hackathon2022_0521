@@ -22,6 +22,19 @@ func (f UserFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error)
 	return f(ctx, mv)
 }
 
+// The UserSkillFunc type is an adapter to allow the use of ordinary
+// function as UserSkill mutator.
+type UserSkillFunc func(context.Context, *ent.UserSkillMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f UserSkillFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.UserSkillMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.UserSkillMutation", m)
+	}
+	return f(ctx, mv)
+}
+
 // Condition is a hook condition function.
 type Condition func(context.Context, ent.Mutation) bool
 

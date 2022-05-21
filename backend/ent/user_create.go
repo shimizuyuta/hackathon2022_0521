@@ -10,6 +10,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/squadra-ricordo/ent/user"
+	"github.com/squadra-ricordo/ent/userskill"
 )
 
 // UserCreate is the builder for creating a User entity.
@@ -35,6 +36,21 @@ func (uc *UserCreate) SetEmail(s string) *UserCreate {
 func (uc *UserCreate) SetPasswordHash(s string) *UserCreate {
 	uc.mutation.SetPasswordHash(s)
 	return uc
+}
+
+// AddUserSkillIDs adds the "user_skills" edge to the UserSkill entity by IDs.
+func (uc *UserCreate) AddUserSkillIDs(ids ...int) *UserCreate {
+	uc.mutation.AddUserSkillIDs(ids...)
+	return uc
+}
+
+// AddUserSkills adds the "user_skills" edges to the UserSkill entity.
+func (uc *UserCreate) AddUserSkills(u ...*UserSkill) *UserCreate {
+	ids := make([]int, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return uc.AddUserSkillIDs(ids...)
 }
 
 // Mutation returns the UserMutation object of the builder.
@@ -166,6 +182,25 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 			Column: user.FieldPasswordHash,
 		})
 		_node.PasswordHash = value
+	}
+	if nodes := uc.mutation.UserSkillsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.UserSkillsTable,
+			Columns: []string{user.UserSkillsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: userskill.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

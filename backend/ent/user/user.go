@@ -13,8 +13,17 @@ const (
 	FieldEmail = "email"
 	// FieldPasswordHash holds the string denoting the password_hash field in the database.
 	FieldPasswordHash = "password_hash"
+	// EdgeUserSkills holds the string denoting the user_skills edge name in mutations.
+	EdgeUserSkills = "user_skills"
 	// Table holds the table name of the user in the database.
 	Table = "users"
+	// UserSkillsTable is the table that holds the user_skills relation/edge.
+	UserSkillsTable = "user_skills"
+	// UserSkillsInverseTable is the table name for the UserSkill entity.
+	// It exists in this package in order to avoid circular dependency with the "userskill" package.
+	UserSkillsInverseTable = "user_skills"
+	// UserSkillsColumn is the table column denoting the user_skills relation/edge.
+	UserSkillsColumn = "user_user_skills"
 )
 
 // Columns holds all SQL columns for user fields.

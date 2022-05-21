@@ -4,6 +4,7 @@ package user
 
 import (
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/squadra-ricordo/ent/predicate"
 )
 
@@ -441,6 +442,34 @@ func PasswordHashEqualFold(v string) predicate.User {
 func PasswordHashContainsFold(v string) predicate.User {
 	return predicate.User(func(s *sql.Selector) {
 		s.Where(sql.ContainsFold(s.C(FieldPasswordHash), v))
+	})
+}
+
+// HasUserSkills applies the HasEdge predicate on the "user_skills" edge.
+func HasUserSkills() predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(UserSkillsTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, UserSkillsTable, UserSkillsColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasUserSkillsWith applies the HasEdge predicate on the "user_skills" edge with a given conditions (other predicates).
+func HasUserSkillsWith(preds ...predicate.UserSkill) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(UserSkillsInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, UserSkillsTable, UserSkillsColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
 	})
 }
 

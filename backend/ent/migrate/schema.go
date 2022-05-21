@@ -21,11 +21,32 @@ var (
 		Columns:    UsersColumns,
 		PrimaryKey: []*schema.Column{UsersColumns[0]},
 	}
+	// UserSkillsColumns holds the columns for the "user_skills" table.
+	UserSkillsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "user_user_skills", Type: field.TypeInt, Nullable: true},
+	}
+	// UserSkillsTable holds the schema information for the "user_skills" table.
+	UserSkillsTable = &schema.Table{
+		Name:       "user_skills",
+		Columns:    UserSkillsColumns,
+		PrimaryKey: []*schema.Column{UserSkillsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "user_skills_users_user_skills",
+				Columns:    []*schema.Column{UserSkillsColumns[1]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		UsersTable,
+		UserSkillsTable,
 	}
 )
 
 func init() {
+	UserSkillsTable.ForeignKeys[0].RefTable = UsersTable
 }
