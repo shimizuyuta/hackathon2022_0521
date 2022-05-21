@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	client, err := ent.Open("mysql", "root:Pvmgz-mysql-1276@tcp(127.0.0.1:3306)/test_go")
+	client, err := ent.Open("mysql", "host:password@tcp(127.0.0.1:3306)/test_go")
 	if err != nil {
 		log.Fatalf("failed connecting to mysql: %v", err)
 	}
