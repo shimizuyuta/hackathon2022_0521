@@ -119,7 +119,27 @@ paths:
           description: Internal server error
         '403':
           description: Bad request
-
+  /skills:
+    get:
+      tags:
+        - skills
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  skills:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        name:
+                          type: string
 components:
   schemas:
     User:
