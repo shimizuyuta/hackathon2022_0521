@@ -54,8 +54,6 @@ func main() {
 			return c.String(http.StatusBadRequest, "Bad Request")
 		}
 
-		fmt.Printf("%s %s %s", p.Name, p.Email, p.PasswordHash)
-
 		ctx := context.Background()
 
 		lib.CreateUser(client, p.Name, p.Email, p.PasswordHash, ctx)
