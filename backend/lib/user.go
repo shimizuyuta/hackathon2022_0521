@@ -7,7 +7,7 @@ import (
 )
 
 // 戻り値のない関数
-func Register(client *ent.Client, name string, email string, password_hash string, ctx context.Context) {
+func CreateUser(client *ent.Client, name string, email string, password_hash string, ctx context.Context) {
 	client.User.
 		Create().
 		SetName(name).
