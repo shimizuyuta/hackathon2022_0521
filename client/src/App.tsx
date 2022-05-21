@@ -4,6 +4,7 @@ import Top from './pages/Top/Top';
 import SignUp from './pages/SiginUp/SignUp';
 import './App.css';
 import Navbar from './components/Navbar';
+import Post from './pages/Posts/Post';
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
         <Route path='/' element ={<Top />} />
         <Route path='/login' element={<Login />} />
         <Route path='/signup' element={<SignUp />} />
+        <Route path='/post' element={<Post />} />
       </Routes>
     </BrowserRouter>
     </>
