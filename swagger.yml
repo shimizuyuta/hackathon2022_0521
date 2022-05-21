@@ -87,6 +87,34 @@ paths:
                           format: date
                         user:
                           $ref: '#/components/schemas/User'
+    post:
+      tags:
+        - posts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_id:
+                  type: integer
+                title:
+                  type: string
+                description:
+                  type: string
+                start_at:
+                  type: string
+                  format: date
+                end_at:
+                  type: string
+                  format: date
+      responses:
+        '200':
+          description: OK
+        '500':
+          description: Internal server error
+        '403':
+          description: Bad request
 
 components:
   schemas:
