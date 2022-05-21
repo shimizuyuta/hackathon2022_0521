@@ -134,12 +134,7 @@ paths:
                   skills:
                     type: array
                     items:
-                      type: object
-                      properties:
-                        id:
-                          type: integer
-                        name:
-                          type: string
+                      $ref: '#/components/schemas/Skill'
 components:
   schemas:
     User:
@@ -154,9 +149,11 @@ components:
         skills:
           type: array
           items:
-            type: object
-            properties:
-              id:
-                type: integer
-              name:
-                type: string
+            $ref: '#/components/schemas/Skill'
+    Skill:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
