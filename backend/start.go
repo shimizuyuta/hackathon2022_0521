@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"log"
+	"os"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/squadra-ricordo/ent"
@@ -10,7 +11,7 @@ import (
 )
 
 func main() {
-	client, err := ent.Open("mysql", "host:password@tcp(127.0.0.1:3306)/test_go")
+	client, err := ent.Open("mysql", "root:"+os.Getenv("PASSWORD")+"@tcp("+os.Getenv("LOCALHOST")+":3306)/"+os.Getenv("DB_NAME"))
 	if err != nil {
 		log.Fatalf("failed connecting to mysql: %v", err)
 	}
