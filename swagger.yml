@@ -1,0 +1,159 @@
+openapi: '3.0.2'
+info:
+  title: API Title
+  version: '1.0'
+servers:
+  - url: https://localhost:8080
+paths:
+  /users:
+    get:
+      tags:
+        - users
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  users:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/User'
+    post:
+      tags: 
+        - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                password_hash:
+                  type: string
+      responses:
+        '200':
+          description: OK
+  /posts:
+    get:
+      tags:
+        - posts
+      parameters:
+        - name: from
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+        - name: to
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+        - name: user_id
+          in: query
+          required: false
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  posts:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        title:
+                          type: string
+                        description:
+                          type: string
+                        start_at:
+                          type: string
+                          format: date
+                        end_at:
+                          type: string
+                          format: date
+                        created_at:
+                          type: string
+                          format: date
+                        user:
+                          $ref: '#/components/schemas/User'
+    post:
+      tags:
+        - posts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_id:
+                  type: integer
+                title:
+                  type: string
+                description:
+                  type: string
+                start_at:
+                  type: string
+                  format: date
+                end_at:
+                  type: string
+                  format: date
+      responses:
+        '200':
+          description: OK
+        '500':
+          description: Internal server error
+        '403':
+          description: Bad request
+  /skills:
+    get:
+      tags:
+        - skills
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  skills:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Skill'
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        email:
+          type: string
+        skills:
+          type: array
+          items:
+            $ref: '#/components/schemas/Skill'
+    Skill:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
