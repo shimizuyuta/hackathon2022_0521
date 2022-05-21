@@ -18,23 +18,7 @@ paths:
                   users:
                     type: array
                     items:
-                      type: object
-                      properties:
-                        id:
-                          type: integer
-                        name:
-                          type: string
-                        email:
-                          type: string
-                        skills:
-                          type: array
-                          items:
-                            type: object
-                            properties:
-                              id:
-                                type: integer
-                              name:
-                                type: string
+                      $ref: '#/components/schemas/User'
     post:
       requestBody:
         content:
@@ -51,4 +35,76 @@ paths:
       responses:
         '200':
           description: OK
-  
+  /posts:
+    get:
+      tags:
+        - posts
+      parameters:
+        - name: from
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+        - name: to
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+        - name: user_id
+          in: query
+          required: false
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  posts:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        title:
+                          type: string
+                        description:
+                          type: string
+                        start_at:
+                          type: string
+                          format: date
+                        end_at:
+                          type: string
+                          format: date
+                        created_at:
+                          type: string
+                          format: date
+                        user:
+                          $ref: '#/components/schemas/User'
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        email:
+          type: string
+        skills:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+              name:
+                type: string
