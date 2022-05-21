@@ -7,6 +7,8 @@ servers:
 paths:
   /users:
     get:
+      tags:
+        - users
       responses:
         '200':
           description: OK
@@ -20,6 +22,8 @@ paths:
                     items:
                       $ref: '#/components/schemas/User'
     post:
+      tags: 
+        - users
       requestBody:
         content:
           application/json:
