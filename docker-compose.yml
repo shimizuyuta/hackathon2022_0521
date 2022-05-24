@@ -18,6 +18,9 @@ services:
       - 80:80
     depends_on:
       - backend
+        
+    tty: true
+    stdin_open: true 
   db:
     image: mariadb:latest
     environment:
