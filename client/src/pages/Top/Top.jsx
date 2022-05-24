@@ -1,8 +1,14 @@
 import React from 'react'
+import PostCard from '../../components/PostCard'
 
 const Top = () => {
   return (
-    <div>Top</div>
+    <div>
+      <PostCard/>
+      <PostCard/>
+      <PostCard/>
+      
+    </div>
   )
 }
 
