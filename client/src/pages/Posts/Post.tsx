@@ -8,6 +8,7 @@ import CreateIcon from '@mui/icons-material/Create';
 import React, { useState } from 'react';
 import dayjs from 'dayjs';
 import { ChangeEvent } from 'react';
+import { Link } from "react-router-dom";
 
 type PostForm = {
   title: string,
@@ -122,6 +123,8 @@ const Post = () => {
           endIcon={<CreateIcon />}  
           size="large" 
           sx={{ mx:3, px:3 }}
+          component={Link}
+          to="/"
         >
           投稿する
         </Button>

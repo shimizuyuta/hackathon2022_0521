@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Button, Container, Stack, TextField, Box } from '@mui/material'
 import { SubmitHandler, useForm } from 'react-hook-form'
-
+import { Link } from "react-router-dom";
 type NewUserForm = {
   email:string,
   password:string,
@@ -40,8 +40,10 @@ const SignUp = () => {
             variant="contained" 
             size="large"
             type='submit'
+            component={Link}
+            to="/login"
           >
-            作成
+            ユーザー作成
           </Button>
         </Stack>
       </Box>
